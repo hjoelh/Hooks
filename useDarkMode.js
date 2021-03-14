@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import styled from "styled-components";
+import React, { useState, useEffect, useCallback } from "react";
+import { createGlobalStyle, ThemeProvider } from "styled-components";
 
 export default function useDarkMode() {
   const [darkMode, setDarkMode] = useState(
@@ -12,17 +12,30 @@ export default function useDarkMode() {
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
 
-  return [darkMode, toggleDarkMode, DarkDiv];
+  const GlobalTheme = ({ children }) => (
+    <ThemeProvider theme={{ darkMode }}>
+      <GlobalStyle />
+      {children}
+    </ThemeProvider>
+  );
+
+  return [darkMode, toggleDarkMode, useCallback(GlobalTheme, [darkMode])];
 }
 
-const DarkDiv = styled.div`
-  pointer-events: none;
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background: white;
-  mix-blend-mode: difference;
-  z-index: 999;
+const GlobalStyle = createGlobalStyle`
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+${'' /* body {
+  max-width: 500px;
+  margin: auto;
+  overflow: hidden;
+  background: ${({ theme }) => (theme.darkMode ? "black" : "white")};
+} */}
 `;
